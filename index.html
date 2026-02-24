@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <style>
-body { margin: 0; overflow: hidden; background: skyblue; }
-canvas { display: block; margin: auto; }
+body { margin:0; overflow:hidden; background:skyblue; }
+canvas { display:block; }
 </style>
 </head>
 <body>
@@ -18,27 +18,51 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let player = {x:100,y:canvas.height-150,w:40,h:50,dy:0,g:0.8,j:-15,on:true};
+let player = {
+  x:100,
+  y:canvas.height-150,
+  w:40,
+  h:50,
+  dy:0,
+  gravity:0.8,
+  jump:-15,
+  onGround:true
+};
+
 let ground = canvas.height-80;
+let moveLeft = false;
+let moveRight = false;
 
 document.addEventListener("touchstart", e=>{
-  if(e.touches[0].clientX < innerWidth/2){
-    player.x -= 20;
-  } else if(player.on){
-    player.dy = player.j;
-    player.on = false;
+  let xTouch = e.touches[0].clientX;
+  if(xTouch < innerWidth/2){
+    moveLeft = true;
+  } else {
+    if(player.onGround){
+      player.dy = player.jump;
+      player.onGround = false;
+    }
   }
+});
+
+document.addEventListener("touchend", ()=>{
+  moveLeft = false;
 });
 
 function update(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  player.dy += player.g;
+
+  if(moveLeft){
+    player.x -= 5;
+  }
+
+  player.dy += player.gravity;
   player.y += player.dy;
 
   if(player.y + player.h >= ground){
     player.y = ground - player.h;
     player.dy = 0;
-    player.on = true;
+    player.onGround = true;
   }
 
   ctx.fillStyle="green";
@@ -49,6 +73,7 @@ function update(){
 
   requestAnimationFrame(update);
 }
+
 update();
 </script>
 
